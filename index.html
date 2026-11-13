@@ -79,23 +79,28 @@ h1{font-family:var(--serif);font-weight:800;font-size:clamp(32px,9vw,46px);line-
 @keyframes redflash{0%{opacity:.55}50%{opacity:0}75%{opacity:.35}100%{opacity:0}}
 
 #reader{max-width:34em;margin:0 auto;padding-block:16vh 30vh;font-size:var(--fs);position:relative;z-index:1}
-#story{display:flex;flex-direction:column;gap:1.4em}
-.ch{min-height:70vh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:.6em;text-align:center}
+#story{display:flex;flex-direction:column;gap:1.4em;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#tapHint{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:21;
+  padding:7px 12px;border:1px solid rgba(255,255,255,.09);border-radius:999px;background:rgba(10,12,15,.72);backdrop-filter:blur(8px);
+  color:var(--dim);font:500 11px/1.2 var(--sans);letter-spacing:.08em;pointer-events:none;transition:opacity .25s,color .25s;white-space:nowrap}
+#tapHint.done{color:var(--glow)}
+.ch{min-height:70vh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:.6em;text-align:center;opacity:0;transition:opacity .7s}
+.ch.seen{opacity:1}
 .ch .n{font-family:var(--sans);font-size:.7em;letter-spacing:.3em;color:var(--dim);padding-left:.3em}
 .ch h2{font-family:var(--serif);font-weight:800;font-size:1.5em;color:var(--glow);margin:0;text-wrap:balance}
 .ch .rule{width:1px;height:3em;background:linear-gradient(var(--dim),transparent);margin-top:.6em}
 
 .p{font-family:var(--serif);line-height:2.05;margin:0;white-space:pre-line;word-break:keep-all;overflow-wrap:anywhere;
-  opacity:.06;transform:translateY(10px);transition:opacity 1.3s ease,transform 1.3s ease,color 2s}
+  opacity:0;transform:translateY(10px);transition:opacity 1.3s ease,transform 1.3s ease,color 2s}
 .p.seen{opacity:1;transform:none}
 .p.hit{color:#dccbc7}
 .p.shake{animation:shiver .5s 1}
 @keyframes shiver{0%,100%{transform:none}20%{transform:translateX(-1.5px)}40%{transform:translateX(1.5px)}60%{transform:translateX(-1px)}80%{transform:translateX(.6px)}}
 .note{font-family:var(--sans);font-size:.78em;color:var(--dim);line-height:1.8;text-align:center;max-width:30em;align-self:center;white-space:pre-line;word-break:keep-all;
-  opacity:.06;transition:opacity 1s}
+  opacity:0;transition:opacity 1s}
 .note.seen{opacity:1}
 
-.msg{display:flex;flex-direction:column;gap:4px;max-width:80%;font-family:var(--sans);font-size:.86em;opacity:.06;transition:opacity .5s}
+.msg{display:flex;flex-direction:column;gap:4px;max-width:80%;font-family:var(--sans);font-size:.86em;opacity:0;transition:opacity .5s}
 .msg.seen{opacity:1}
 .msg+.msg{margin-top:-.8em}
 .msg.them{align-self:flex-start}
@@ -115,7 +120,7 @@ h1{font-family:var(--serif);font-weight:800;font-size:clamp(32px,9vw,46px);line-
 .typing span:nth-child(3){animation-delay:.3s}
 @keyframes dot{0%,60%,100%{opacity:.25;transform:none}30%{opacity:1;transform:translateY(-3px)}}
 
-figure{margin:.6em 0;display:flex;flex-direction:column;gap:8px;align-items:center;opacity:.06;transition:opacity .4s}
+figure{margin:.6em 0;display:flex;flex-direction:column;gap:8px;align-items:center;opacity:0;transition:opacity .4s}
 figure.seen{opacity:1}
 figure img{display:block;max-width:100%;max-height:78vh;border-radius:4px;cursor:zoom-in;background:#0d0f12}
 figure.seen img{animation:develop 2.4s ease-out 1}
@@ -169,7 +174,7 @@ figure figcaption{font-size:.72em;color:var(--dim);font-family:var(--sans)}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
-  .p,.msg,.note,figure{opacity:1;transform:none}
+  .p.seen,.msg.seen,.note.seen,figure.seen,.ch.seen{opacity:1;transform:none}
 }
 </style>
 </head>
@@ -214,6 +219,7 @@ figure figcaption{font-size:.72em;color:var(--dim);font-family:var(--sans)}
   <div class="tx"><div class="hd"><span id="nName">Dean</span><small>지금</small></div><div class="bd" id="nBody"></div></div>
 </div>
 <div id="lightbox" hidden><img alt="" id="lbImg"></div>
+<div id="tapHint" hidden>화면을 터치해 계속</div>
 
 <button id="gear" type="button" aria-label="설정" aria-expanded="false" aria-controls="panel" hidden>
   <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
@@ -221,8 +227,8 @@ figure figcaption{font-size:.72em;color:var(--dim);font-family:var(--sans)}
 <div id="panel" hidden>
   <div class="chaps" id="chaps"></div>
   <div class="opt"><label id="lSound">소리</label><button class="sw" id="optSound" role="switch" aria-labelledby="lSound" aria-checked="true" type="button"></button></div>
-  <div class="opt"><label id="lAuto">자동 스크롤</label><button class="sw" id="optAuto" role="switch" aria-labelledby="lAuto" aria-checked="false" type="button"></button></div>
-  <div class="opt"><label>속도</label><div class="step"><button type="button" data-k="speed" data-d="-1" aria-label="느리게">−</button><output id="vSpeed">2</output><button type="button" data-k="speed" data-d="1" aria-label="빠르게">+</button></div></div>
+  <div class="opt" hidden><label id="lAuto">자동 스크롤</label><button class="sw" id="optAuto" role="switch" aria-labelledby="lAuto" aria-checked="false" type="button"></button></div>
+  <div class="opt" hidden><label>속도</label><div class="step"><button type="button" data-k="speed" data-d="-1" aria-label="느리게">−</button><output id="vSpeed">2</output><button type="button" data-k="speed" data-d="1" aria-label="빠르게">+</button></div></div>
   <div class="opt" style="border-bottom:0"><label>글자 크기</label><div class="step"><button type="button" data-k="size" data-d="-1" aria-label="작게">−</button><output id="vSize">3</output><button type="button" data-k="size" data-d="1" aria-label="크게">+</button></div></div>
 </div>
 
@@ -235,6 +241,7 @@ const K = { pos: 'unreach-pos-v2', pref: 'unreach-pref-v2' };
 const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
 const pref = Object.assign({ sound: true, auto: false, speed: 2, size: 3 }, (() => { try { return JSON.parse(lsGet(K.pref)) || {}; } catch (e) { return {}; } })());
+pref.auto = false;
 const savePref = () => lsSet(K.pref, JSON.stringify(pref));
 const SPEEDS = [10, 18, 28, 42, 60], SIZES = [16, 17.5, 19, 21, 23];
 
@@ -569,11 +576,25 @@ function moldDraw() {
 
 /* ---------- 진행 ---------- */
 let progress = 0, curCh = 0;
-const io = new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) { io.unobserve(e.target); reveal(e.target, true); } }, { rootMargin: '0px 0px -24% 0px', threshold: .1 });
+let nextIndex = 0, typingTimer = 0, typingState = null;
+const io = { observe() {}, unobserve() {}, disconnect() {} };
 let notifT = 0;
 function notify(name, body) {
   $('#nName').textContent = name; $('#nIc').textContent = name[0]; $('#nBody').textContent = body;
   const n = $('#notif'); n.classList.add('on'); clearTimeout(notifT); notifT = setTimeout(() => n.classList.remove('on'), 2600);
+}
+function completeMessage(state) {
+  const { bub, body, b, el } = state;
+  bub.textContent = body; ping(); vibrate(40);
+  if (b.who === 'Dean') notify('Dean', body);
+  if (b.who === 'Dean' && /이리와/.test(body)) { el.classList.add('come'); setTimeout(() => { flash(); thud(.6); vibrate([80, 40, 80]); }, 250); }
+  updateTapHint(false);
+}
+function finishTyping() {
+  if (!typingState) return false;
+  clearTimeout(typingTimer); typingTimer = 0;
+  const state = typingState; typingState = null; completeMessage(state);
+  return true;
 }
 function reveal(el, live) {
   if (el.classList.contains('seen')) return;
@@ -587,16 +608,32 @@ function reveal(el, live) {
     if (b.me) { sent(); return; }
     const bub = el.querySelector('.bub'), body = bub.dataset.body;
     bub.textContent = ''; const ty = document.createElement('span'); ty.className = 'typing'; ty.innerHTML = '<span></span><span></span><span></span>'; bub.appendChild(ty);
-    setTimeout(() => {
-      bub.textContent = body; ping(); vibrate(40);
-      if (b.who === 'Dean') notify('Dean', body);
-      if (b.who === 'Dean' && /이리와/.test(body)) { el.classList.add('come'); setTimeout(() => { flash(); thud(.6); vibrate([80, 40, 80]); }, 250); }
-    }, Math.min(1500, 450 + body.length * 22));
+    const state = typingState = { bub, body, b, el };
+    typingTimer = setTimeout(() => { if (typingState !== state) return; typingState = null; typingTimer = 0; completeMessage(state); }, Math.min(1500, 450 + body.length * 22));
   } else if (b.t === 'img') {
     thud(.35);
   } else if (b.t === 'p') {
     fxFor(b.body, el);
   }
+}
+function updateTapHint(done = false) {
+  const hint = $('#tapHint');
+  hint.hidden = false; hint.classList.toggle('done', done);
+  hint.textContent = done ? '끝까지 읽었습니다' : (typingState ? '한 번 더 터치하면 바로 표시' : '화면을 터치해 계속');
+}
+function revealNext() {
+  if ($('#reader').hidden || !$('#lightbox').hidden || !panel.hidden) return;
+  if (finishTyping()) { updateTapHint(false); return; }
+  while (nextIndex < blockEls.length && blockEls[nextIndex].classList.contains('seen')) nextIndex++;
+  if (nextIndex >= blockEls.length) { updateTapHint(true); return; }
+  const el = blockEls[nextIndex++];
+  reveal(el, true); updateTapHint(false);
+  lsSet(K.pos, JSON.stringify({ i: +el.dataset.i, p: progress }));
+  requestAnimationFrame(() => {
+    const r = el.getBoundingClientRect(), margin = innerHeight * .16;
+    if (r.top < margin || r.bottom > innerHeight - margin) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    onScroll();
+  });
 }
 function onScroll() {
   const r = $('#story').getBoundingClientRect();
@@ -620,14 +657,16 @@ function onScroll() {
   }
   clearTimeout(onScroll.t);
   onScroll.t = setTimeout(() => {
-    const top = blockEls.find(el => el.getBoundingClientRect().bottom > innerHeight * .2);
-    if (top) lsSet(K.pos, JSON.stringify({ i: +top.dataset.i, p: progress }));
+    const current = blockEls[Math.max(0, nextIndex - 1)];
+    if (current) lsSet(K.pos, JSON.stringify({ i: +current.dataset.i, p: progress }));
   }, 400);
 }
 function markChap() { [...$('#chaps').children].forEach((b, j) => b.classList.toggle('cur', j === curCh)); }
 function jumpTo(el) {
   const els = blockEls, idx = els.indexOf(el);
-  els.forEach((e, j) => { if (j < idx) { io.unobserve(e); reveal(e, false); } });
+  finishTyping();
+  els.forEach((e, j) => { if (j <= idx) { io.unobserve(e); reveal(e, false); } });
+  nextIndex = idx + 1; updateTapHint(nextIndex >= blockEls.length);
   el.scrollIntoView({ block: 'start' });
   scrollBy(0, -innerHeight * .1);
   $('#panel').hidden = true; $('#gear').setAttribute('aria-expanded', 'false');
@@ -650,21 +689,23 @@ requestAnimationFrame(loop);
 function start(resume) {
   audioInit();
   $('#cover').hidden = true;
-  ['#reader', '#bar', '#vignette', '#gear', '#mold'].forEach(s => $(s).hidden = false);
+  ['#reader', '#bar', '#vignette', '#gear', '#mold', '#tapHint'].forEach(s => $(s).hidden = false);
   render(); moldInit();
   let target = null;
   if (resume) { try { const s = JSON.parse(lsGet(K.pos)); target = blockEls[s.i]; } catch (e) {} }
   const ti = target ? blockEls.indexOf(target) : -1;
-  blockEls.forEach((el, j) => { if (j < ti) reveal(el, false); });
+  blockEls.forEach((el, j) => { if (j <= ti) reveal(el, false); });
+  nextIndex = Math.max(0, ti + 1); updateTapHint(nextIndex >= blockEls.length);
   if (target) { target.scrollIntoView({ block: 'start' }); scrollBy(0, -innerHeight * .2); } else scrollTo(0, 0);
   requestAnimationFrame(() => {
-    blockEls.forEach(el => { if (el.classList.contains('seen')) return; if (el.getBoundingClientRect().top < innerHeight * .76) reveal(el, false); else io.observe(el); });
     onScroll(); markChap();
+    if (!target) revealNext();
   });
 }
 function toCover() {
+  clearTimeout(typingTimer); typingTimer = 0; typingState = null; nextIndex = 0;
   io.disconnect();
-  ['#reader', '#bar', '#vignette', '#gear', '#panel', '#mold'].forEach(s => $(s).hidden = true);
+  ['#reader', '#bar', '#vignette', '#gear', '#panel', '#mold', '#tapHint'].forEach(s => $(s).hidden = true);
   $('#cover').hidden = false; scrollTo(0, 0);
   if (A.ctx) A.drone.gain.setTargetAtTime(0, A.ctx.currentTime, .4);
   lsSet(K.pos, ''); refreshCover();
@@ -704,7 +745,12 @@ $('#again').addEventListener('click', toCover);
 $('#file').addEventListener('change', async e => { const f = e.target.files[0]; if (f) await load(await f.arrayBuffer(), true); e.target.value = ''; });
 addEventListener('scroll', onScroll, { passive: true });
 addEventListener('resize', () => { if (!$('#reader').hidden) { moldInit(); onScroll(); } });
-$('#story').addEventListener('click', e => { const im = e.target.closest('figure img'); if (!im) return; $('#lbImg').src = im.src; $('#lightbox').hidden = false; });
+$('#reader').addEventListener('click', e => {
+  const im = e.target.closest('figure img');
+  if (im) { $('#lbImg').src = im.src; $('#lightbox').hidden = false; return; }
+  if (e.target.closest('a,button,input,label,select,textarea')) return;
+  revealNext();
+});
 $('#lightbox').addEventListener('click', () => { $('#lightbox').hidden = true; });
 
 /* 설정 */
@@ -725,9 +771,8 @@ panel.querySelectorAll('.step button').forEach(b => b.addEventListener('click', 
 }));
 addEventListener('keydown', e => {
   if ($('#reader').hidden) return;
-  if (e.key === ' ') { e.preventDefault(); pref.auto = !pref.auto; pauseUntil = 0; syncPanel(); savePref(); }
+  if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowDown') { e.preventDefault(); revealNext(); }
   else if (e.key === 'Escape') { panel.hidden = true; gear.setAttribute('aria-expanded', 'false'); $('#lightbox').hidden = true; }
-  else pauseUntil = performance.now() + 2500;
 });
 syncPanel();
 
