@@ -733,6 +733,11 @@ syncPanel();
 /* 시작: 같은 폴더의 story.docx → 저장해 둔 파일 → 직접 열기 */
 (async () => {
   refreshCover();
+  if (window.EMBED_DOCX) { // 내 컴퓨터용 단독 파일: docx가 파일 안에 들어 있음
+    const bin = atob(window.EMBED_DOCX), u8 = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    await load(u8.buffer, false); return;
+  }
   try { const r = await fetch('story.docx', { cache: 'no-store' }); if (r.ok) { await load(await r.arrayBuffer(), false); return; } } catch (e) {}
   const saved = await idbGet(); if (saved) await load(saved, false);
 })();
