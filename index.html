@@ -299,6 +299,13 @@ const SOFTEN = {
   'Sam: 야동!': 'Sam: 넷플릭스!',
   '나: ㅋㅋㅋㅋ 얃ㄷㄷ오랑 볏신이 뭐냐ㅋㅋㅋ': '나: ㅋㅋㅋㅋ 볼 거ㄷㄷ어랑 볏신이 뭐냐ㅋㅋㅋ',
 };
+// 원문에서 화자 표기가 다음 문단에 반복되지 않은 문자 내용
+const MESSAGE_CONTINUATIONS = new Set([
+  '너 최근에 무슨 화면 어둡게 나오고 막 깨지는 그런 가정용 비디오 같은 거 안봤냐?',
+  '스파이더 파워를 각성한거지',
+  '이거 그냥ㅇ 손떠ㅓㄹ려서 그런거임.',
+  '심령사진 그ㄹ럴거 아니ㅏ',
+]);
 
 async function readDocx(buf) {
   const zip = await JSZip.loadAsync(buf);
@@ -374,6 +381,7 @@ function build(paras, media) {
     }
     if (/={5,}\s*$/.test(s)) continue;           // "내 친구가 연락이 안돼(2)=====" 같은 구분 줄
     if (/^↓/.test(s) || /^https?:\/\//.test(s)) { lastUrl = s; continue; }
+    if (lastMsg && MESSAGE_CONTINUATIONS.has(s)) { lastMsg.body += '\n' + s; gapSinceMsg = false; continue; }
     const sp = s.match(SPEAKER);
     if (sp) {
       flush();
