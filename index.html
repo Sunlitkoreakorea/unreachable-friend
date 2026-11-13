@@ -96,7 +96,7 @@ h1{font-family:var(--serif);font-weight:800;font-size:clamp(32px,9vw,46px);line-
 .p.hit{color:#dccbc7}
 .p.shake{animation:shiver .5s 1}
 @keyframes shiver{0%,100%{transform:none}20%{transform:translateX(-1.5px)}40%{transform:translateX(1.5px)}60%{transform:translateX(-1px)}80%{transform:translateX(.6px)}}
-.note{font-family:var(--sans);font-size:.78em;color:var(--dim);line-height:1.8;text-align:center;max-width:30em;align-self:center;white-space:pre-line;word-break:keep-all;
+.note{font-family:var(--sans);font-size:.86em;color:#aeb4bd;line-height:1.9;text-align:center;max-width:30em;align-self:center;white-space:pre-line;word-break:keep-all;
   opacity:0;transition:opacity 1s}
 .note.seen{opacity:1}
 
@@ -121,6 +121,7 @@ h1{font-family:var(--serif);font-weight:800;font-size:clamp(32px,9vw,46px);line-
 @keyframes dot{0%,60%,100%{opacity:.25;transform:none}30%{opacity:1;transform:translateY(-3px)}}
 
 figure{margin:.6em 0;display:flex;flex-direction:column;gap:8px;align-items:center;opacity:0;transition:opacity .4s}
+figure:not(.seen){display:none;pointer-events:none}
 figure.seen{opacity:1}
 figure img{display:block;max-width:100%;max-height:78vh;border-radius:4px;cursor:zoom-in;background:#0d0f12}
 figure.seen img{animation:develop 2.4s ease-out 1}
